@@ -1,0 +1,59 @@
+CREATE DATABASE IF NOT EXISTS iamroot_public
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE iamroot_public;
+
+CREATE TABLE usuarios (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(180) NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE aplicaciones (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(80) NOT NULL UNIQUE,
+    nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+CREATE TABLE roles (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(60) NOT NULL UNIQUE,
+    descripcion VARCHAR(255) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE permisos (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(100) NOT NULL UNIQUE,
+    nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(255) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE usuario_aplicaciones (
+    id_user INT UNSIGNED NOT NULL,
+    id_app INT UNSIGNED NOT NULL,
+    id_rol INT UNSIGNED NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (id_user, id_app),
+    CONSTRAINT fk_ua_user FOREIGN KEY (id_user) REFERENCES usuarios(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_ua_app FOREIGN KEY (id_app) REFERENCES aplicaciones(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_ua_role FOREIGN KEY (id_rol) REFERENCES roles(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE rol_permisos (
+    id_rol INT UNSIGNED NOT NULL,
+    id_permiso INT UNSIGNED NOT NULL,
+    PRIMARY KEY (id_rol, id_permiso),
+    CONSTRAINT fk_rp_role FOREIGN KEY (id_rol) REFERENCES roles(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_rp_permiso FOREIGN KEY (id_permiso) REFERENCES permisos(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
